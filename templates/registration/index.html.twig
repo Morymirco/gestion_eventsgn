@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des inscriptions{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-people me-2"></i>Gestion des inscriptions</h1>
+        <a href="{{ path('app_registration_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nouvelle inscription
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if registrations %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Utilisateur</th>
+                                <th>Événement</th>
+                                <th>Date d'inscription</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for registration in registrations %}
+                            <tr>
+                                <td>
+                                    <strong>{{ registration.user.fullName }}</strong>
+                                    <br><small class="text-muted">{{ registration.user.email }}</small>
+                                </td>
+                                <td>
+                                    <strong>{{ registration.event.title }}</strong>
+                                    <br><small class="text-muted">{{ registration.event.startDate|date('d/m/Y H:i') }}</small>
+                                </td>
+                                <td>{{ registration.registrationDate|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    {% if registration.isConfirmed %}
+                                        <span class="badge bg-success">Confirmée</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">En attente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        {% if not registration.isConfirmed %}
+                                            <form method="post" action="{{ path('app_registration_confirm', {'id': registration.id}) }}" class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ registration.id) }}">
+                                                <button type="submit" class="btn btn-success btn-sm" title="Confirmer">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <a href="{{ path('app_registration_show', {'id': registration.id}) }}" class="btn btn-outline-info btn-sm">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_registration_edit', {'id': registration.id}) }}" class="btn btn-outline-warning btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-person-x text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 text-muted">Aucune inscription</h4>
+                    <p class="text-muted">Les inscriptions aux événements apparaîtront ici.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
